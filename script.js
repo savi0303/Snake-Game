@@ -15,19 +15,48 @@ let score = 0;
 let gameLoop;
 let gameActive = false;
 
+// Touch variables
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
 // Initialize the game when the window loads
 window.onload = function() {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
+    
+    // Adjust canvas size for mobile
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
     
     initGame();
     
     // Event listeners for keyboard controls
     document.addEventListener('keydown', handleKeyPress);
     
+    // Touch event listeners
+    canvas.addEventListener('touchstart', handleTouchStart, false);
+    canvas.addEventListener('touchmove', handleTouchMove, false);
+    canvas.addEventListener('touchend', handleTouchEnd, false);
+    
     // Restart button
     document.getElementById('restartButton').addEventListener('click', initGame);
 };
+
+// Resize canvas based on window size
+function resizeCanvas() {
+    const containerWidth = Math.min(window.innerWidth - 30, 400);
+    const aspectRatio = GRID_WIDTH / GRID_HEIGHT;
+    
+    canvas.width = containerWidth;
+    canvas.height = containerWidth / aspectRatio;
+    
+    // Redraw if game is active
+    if (gameActive) {
+        drawGame();
+    }
+}
 
 // Initialize the game state
 function initGame() {
@@ -149,6 +178,10 @@ function createFood() {
 
 // Draw everything on the canvas
 function drawGame() {
+    // Calculate cell size based on canvas dimensions
+    const cellWidth = canvas.width / GRID_WIDTH;
+    const cellHeight = canvas.height / GRID_HEIGHT;
+    
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -163,20 +196,20 @@ function drawGame() {
         }
         
         ctx.fillRect(
-            segment.x * GRID_SIZE,
-            segment.y * GRID_SIZE,
-            GRID_SIZE - 1,
-            GRID_SIZE - 1
+            segment.x * cellWidth,
+            segment.y * cellHeight,
+            cellWidth - 1,
+            cellHeight - 1
         );
     });
     
     // Draw the food
     ctx.fillStyle = '#FF5722';
     ctx.fillRect(
-        food.x * GRID_SIZE,
-        food.y * GRID_SIZE,
-        GRID_SIZE - 1,
-        GRID_SIZE - 1
+        food.x * cellWidth,
+        food.y * cellHeight,
+        cellWidth - 1,
+        cellHeight - 1
     );
 }
 
@@ -215,10 +248,68 @@ function handleKeyPress(event) {
     }
 }
 
+// Handle touch start event
+function handleTouchStart(event) {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+    
+    // Prevent default to avoid scrolling
+    event.preventDefault();
+}
+
+// Handle touch move event
+function handleTouchMove(event) {
+    // Prevent default to avoid scrolling
+    event.preventDefault();
+}
+
+// Handle touch end event
+function handleTouchEnd(event) {
+    touchEndX = event.changedTouches[0].clientX;
+    touchEndY = event.changedTouches[0].clientY;
+    
+    // Calculate swipe direction
+    handleSwipe();
+    
+    // Prevent default to avoid scrolling
+    event.preventDefault();
+}
+
+// Handle swipe gesture
+function handleSwipe() {
+    const dx = touchEndX - touchStartX;
+    const dy = touchEndY - touchStartY;
+    
+    // Detect horizontal or vertical swipe based on which delta is larger
+    if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal swipe
+        if (dx > 30) {
+            // Swipe right
+            if (direction !== 'left') nextDirection = 'right';
+        } else if (dx < -30) {
+            // Swipe left
+            if (direction !== 'right') nextDirection = 'left';
+        }
+    } else {
+        // Vertical swipe
+        if (dy > 30) {
+            // Swipe down
+            if (direction !== 'up') nextDirection = 'down';
+        } else if (dy < -30) {
+            // Swipe up
+            if (direction !== 'down') nextDirection = 'up';
+        }
+    }
+}
+
 // End the game
 function endGame() {
     gameActive = false;
     clearInterval(gameLoop);
+    
+    // Calculate cell size for text positioning
+    const cellWidth = canvas.width / GRID_WIDTH;
+    const cellHeight = canvas.height / GRID_HEIGHT;
     
     // Display game over message
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';

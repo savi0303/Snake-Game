@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Snake Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -14,7 +14,10 @@
         </div>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <div class="game-controls">
-            <p>Use Arrow Keys or WASD to control the snake</p>
+            <p class="control-instructions">
+                <span class="desktop-controls">Use Arrow Keys or WASD to control the snake</span>
+                <span class="mobile-controls">Swipe to control the snake</span>
+            </p>
             <button id="restartButton">Restart Game</button>
         </div>
     </div>

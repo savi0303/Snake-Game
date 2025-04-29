@@ -3,24 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Snake Game</title>
+    <title>Snake Master</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="game-container">
-        <h1>Snake Game</h1>
-        <div class="game-info">
-            <div class="score">Score: <span id="score">0</span></div>
+        <!-- Start Menu -->
+        <div id="startMenu" class="menu-overlay">
+            <div class="menu-content">
+                <h1 class="game-title">Snake Master</h1>
+                <div class="logo-container">
+                    <div class="snake-logo">
+                        <div class="snake-head"></div>
+                        <div class="snake-body"></div>
+                        <div class="snake-body"></div>
+                        <div class="snake-body"></div>
+                    </div>
+                </div>
+                <div class="difficulty-selector">
+                    <h3>Select Difficulty</h3>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn selected" data-speed="200">Easy</button>
+                        <button class="difficulty-btn" data-speed="150">Medium</button>
+                        <button class="difficulty-btn" data-speed="100">Hard</button>
+                    </div>
+                </div>
+                <div class="game-mode-selector">
+                    <h3>Game Mode</h3>
+                    <div class="mode-buttons">
+                        <button class="mode-btn selected" data-mode="classic">Classic</button>
+                        <button class="mode-btn" data-mode="no-walls">No Walls</button>
+                    </div>
+                </div>
+                <button id="startButton" class="action-button pulse-button">
+                    <i class="fas fa-play"></i> Start Game
+                </button>
+                <div class="high-scores-preview">
+                    <h3>High Score: <span id="highScoreDisplay">0</span></h3>
+                </div>
+            </div>
         </div>
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <div class="game-controls">
-            <p class="control-instructions">
-                <span class="desktop-controls">Use Arrow Keys or WASD to control the snake</span>
-                <span class="mobile-controls">Swipe to control the snake</span>
-            </p>
-            <button id="restartButton">Restart Game</button>
+
+        <!-- Game UI -->
+        <div id="gameUI" class="hidden">
+            <div class="game-header">
+                <h1>Snake Master</h1>
+                <div class="game-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">Score</span>
+                        <span id="score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">High Score</span>
+                        <span id="highScore" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Level</span>
+                        <span id="level" class="stat-value">1</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <div id="countdown" class="countdown hidden">3</div>
+                <div id="pauseIndicator" class="pause-indicator hidden">
+                    <i class="fas fa-pause"></i>
+                    <p>PAUSED</p>
+                    <p class="pause-tip">Press SPACE or tap Pause button to resume</p>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <div class="control-panel">
+                    <p class="control-instructions">
+                        <span class="desktop-controls"><i class="fas fa-keyboard"></i> Use Arrow Keys or WASD to move</span>
+                        <span class="mobile-controls"><i class="fas fa-hand-pointer"></i> Swipe or use buttons to move</span>
+                    </p>
+                    <div class="button-container">
+                        <button id="pauseButton" class="control-button">
+                            <i class="fas fa-pause pause-icon"></i><i class="fas fa-play play-icon hidden"></i> <span id="pauseButtonText">Pause</span>
+                        </button>
+                        <button id="menuButton" class="control-button">
+                            <i class="fas fa-home"></i> Menu
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Controls -->
+                <div class="mobile-control-buttons">
+                    <div class="control-row">
+                        <button id="upButton" class="direction-button">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div class="control-row">
+                        <button id="leftButton" class="direction-button">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button id="downButton" class="direction-button">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <button id="rightButton" class="direction-button">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Over Menu -->
+        <div id="gameOverMenu" class="menu-overlay hidden">
+            <div class="menu-content">
+                <h2 class="gameover-title">GAME OVER</h2>
+                <div class="results-container">
+                    <div class="result-item">
+                        <span class="result-label">Score:</span>
+                        <span id="finalScore" class="result-value">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">High Score:</span>
+                        <span id="finalHighScore" class="result-value">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Level Reached:</span>
+                        <span id="finalLevel" class="result-value">1</span>
+                    </div>
+                </div>
+                <div class="achievement" id="newHighScore">
+                    <i class="fas fa-trophy"></i> NEW HIGH SCORE!
+                </div>
+                <div class="action-buttons">
+                    <button id="playAgainButton" class="action-button">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button id="mainMenuButton" class="action-button">
+                        <i class="fas fa-home"></i> Main Menu
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+    
+    <div id="notification" class="notification hidden"></div>
+    
     <script src="script.js"></script>
 </body>
 </html>
